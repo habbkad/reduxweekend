@@ -1,25 +1,81 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { useState } from "react";
+import { addUser } from "./Actions/Actions";
+import { connect, useSelector, useDispatch } from "react-redux";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
+import EditData from "./EditData";
+import MapComponent from "./MapComponent";
+
+function App(props) {
+  const [name, setName] = useState();
+  const [age, setAge] = useState();
+  console.log(name);
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  //const state = useSelector((state) => state.users);
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newPerson = {
+      username: name,
+      age,
+    };
+
+    props.addUser(newPerson);
+  };
+
+  console.log(props);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={name}
+          placeholder="Name"
+          type={"text"}
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+        />
+        <br />
+        <input
+          value={age}
+          placeholder="age"
+          type={"number"}
+          onChange={(e) => {
+            setAge(e.target.value);
+          }}
+        />
+        <br />
+        <button>Submit</button>
+      </form>
+
+      {props.state.map((item, index) => {
+        return (
+          <div key={index}>
+            <MapComponent user={item} />
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    state: state.users,
+  };
+};
+
+const mapDispatchToProps = {
+  addUser,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+//export default App;
